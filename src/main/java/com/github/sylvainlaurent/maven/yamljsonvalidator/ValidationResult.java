@@ -1,12 +1,15 @@
 package com.github.sylvainlaurent.maven.yamljsonvalidator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ValidationResult {
 	private final Throwable exc;
 	private List<String> messages = new ArrayList<>();
 	private boolean hasError;
+	private Map<String, String> items = new HashMap<>();
 
 	public ValidationResult() {
 		exc = null;
@@ -44,4 +47,5 @@ public class ValidationResult {
 		return messages;
 	}
 
+	public Map<String, String> getItemMap(){ return items; }
 }

@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This mojo validates YAML and JSON files for well-formedness. If JSON schema is provided, it also
@@ -94,6 +96,8 @@ public class ValidateMojo extends AbstractMojo {
 
             final File[] files = set.getFiles(basedir);
 
+            Map<String, String> propsToFiles = new HashMap<>();
+
             for (final File file : files) {
                 if (verbose) {
                     getLog().info("Validating file " + file);
@@ -105,9 +109,19 @@ public class ValidateMojo extends AbstractMojo {
                 for (final String msg : result.getMessages()) {
                     getLog().warn(msg);
                 }
+                for (final Map.Entry<String, String> entry : result.getItemMap().entrySet()){
+                    String prop = entry.toString().toLowerCase();
+                    String path = file.getName();
+                    if(propsToFiles.containsKey(prop)){
+                        getLog().error(prop + " is duplicated. First seen in "
+                                + propsToFiles.get(prop) + " repeated in " + path);
+                        encounteredError = true;
+                    }else{
+                        propsToFiles.put(prop, path);
+                    }
+                }
             }
         }
-
         if (encounteredError) {
             throw new MojoExecutionException("Some files are not valid, see previous logs");
         }
